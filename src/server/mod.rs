@@ -8,6 +8,7 @@ use tokio::{
     sync::Mutex,
 };
 
+use crate::config;
 use crate::world::player::{ConnectionState, Player};
 
 pub mod network;
@@ -92,14 +93,14 @@ pub fn read_packet<'a>(
             payload.push(network::NetworkValue::String(identifier.clone()));
 
             let identifier = identifier.as_str();
-            
+
             match identifier {
                 "minecraft:brand" => {
                     let brand = network::read_string(buffer)?;
 
                     payload.push(network::NetworkValue::String(brand));
-                },
-                _ => {},
+                }
+                _ => {}
             }
 
             if buffer.len() > 0 {
@@ -108,9 +109,7 @@ pub fn read_packet<'a>(
             }
         }
     }
-    if player.state == ConnectionState::Play {
-
-    }
+    if player.state == ConnectionState::Play {}
 
     Ok((packet_id.clone(), payload))
 }
@@ -246,11 +245,11 @@ pub async fn handle_client(
                 if packet.len() > 2 {
                     // assume next packet has id 0x00
                     // TODO: properly process multiple packets
-                    
+
                     // TODO: write dimensions
                     // let mut client_packet: Vec<u8> = vec![7, 0];
                     // network::write_string(&mut client_packet, "minecraft:dimension_type".to_string());
-                    
+
                     // let mut entries: Vec<u8> = vec![];
                     // network::write_string(&mut entries, "minecraft:overworld".to_string());
                     // // see https://minecraft.wiki/Java_Edition_protocol/Registry_data#Dimension_Type
@@ -271,7 +270,7 @@ pub async fn handle_client(
                     // entries.append(fastnbt::to_bytes(&1)?.as_mut());
                     // entries.append(fastnbt::to_bytes(&0)?.as_mut());
                     // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    
+
                     // network::write_varint(&mut client_packet, entries.len() as i32);
                     // client_packet.append(&mut entries);
 
@@ -287,10 +286,14 @@ pub async fn handle_client(
     }
 }
 
-pub async fn start() -> Result<(), Box<dyn std::error::Error>> {
-    let listener: TcpListener = TcpListener::bind("127.0.0.1:25565").await?;
+pub async fn start(server_config: config::ServerConfig) -> Result<(), Box<dyn std::error::Error>> {
+    let address = format!(
+        "{}:{}",
+        server_config.server_address, server_config.server_port
+    );
+    let listener: TcpListener = TcpListener::bind(&address).await?;
     let server = Arc::new(Mutex::new(ServerState::default()));
-    info!("Starting server...");
+    info!("Starting server at {}...", address);
     loop {
         let stream: TcpStream = listener.accept().await?.0;
         let server = Arc::clone(&server);
