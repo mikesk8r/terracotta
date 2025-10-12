@@ -286,13 +286,16 @@ pub async fn handle_client(
     }
 }
 
-pub async fn start(server_config: config::ServerConfig) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn start(
+    server_config: config::ServerConfig,
+    server: &Arc<Mutex<ServerState>>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let address = format!(
         "{}:{}",
         server_config.server_address, server_config.server_port
     );
     let listener: TcpListener = TcpListener::bind(&address).await?;
-    let server = Arc::new(Mutex::new(ServerState::default()));
+    // let server = Arc::new(Mutex::new(ServerState::default()));
     info!("Starting server at {}...", address);
     loop {
         let stream: TcpStream = listener.accept().await?.0;
