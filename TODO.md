@@ -1,0 +1,34 @@
+# TODO:
+##### Note: This list may be updated or modified at any time. More entries may be added as more features are added.
+- [ ] Configuration
+    - [ ] TOML (?)
+    - [ ] server.properties
+- [ ] Vanilla Server Features
+    - [ ] Network
+        - [ ] Scoreboard
+        - [ ] Chat
+        - [ ] Server List Ping
+            - [X] Name
+            - [X] Player count
+            - [ ] Player sample
+            - [ ] Icon
+    - [ ] World
+        - [ ] Saving
+        - [ ] Loading
+        - [ ] Generation
+            - [ ] Terrain
+            - [ ] Structures
+    - [ ] Players
+        - [ ] Resource Packs
+        - [ ] Datapacks
+        - [ ] Cookies
+        - [ ] Advancements
+        - [ ] Skins
+        - [ ] Fire
+        - [ ] TNT
+        - [ ] Liquids
+        - [ ] Movement
+        - [ ] Animation
+    - [ ] Entities
+        - [ ] Nonliving
+        - [ ] A.I.
