@@ -3,6 +3,7 @@ mod legacy;
 #[derive(Debug, Default)]
 pub struct ServerConfig {
     pub max_players: u32,
+    pub motd: String,
     pub server_address: String,
     pub server_port: u16,
 }
@@ -35,6 +36,13 @@ pub fn get_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
             config.max_players = 20;
         }
 
+        let motd = parsed.get("motd");
+        if motd.is_some() {
+            config.motd = motd.unwrap().to_string();
+        } else {
+            config.motd = "A Minecraft server".to_string();
+        }
+
         let server_address = parsed.get("server_address");
         if server_address.is_some() {
             config.server_address = server_address.unwrap().to_string();
@@ -55,6 +63,7 @@ pub fn get_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
     } else {
         config = ServerConfig {
             max_players: 20,
+            motd: "A Minecraft server".to_string(),
             server_address: "127.0.0.1".to_string(),
             server_port: 25565,
         };

@@ -18,6 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
     tokio::spawn(async move {
         world::begin(&server).await;
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
