@@ -13,6 +13,7 @@ impl ServerConfig {
         let mut config = ServerConfig::default();
 
         config.max_players = legacy_config.max_players;
+        config.motd = legacy_config.motd;
         config.server_address = legacy_config.server_ip;
         config.server_port = legacy_config.server_port;
 
@@ -20,14 +21,14 @@ impl ServerConfig {
     }
 }
 
-pub fn get_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
+pub fn get_config() -> ServerConfig {
     let mut config = ServerConfig::default();
 
     let raw_config = std::fs::read_to_string("./terracotta.toml");
     let legacy_config = std::fs::read_to_string("./server.properties");
     if raw_config.is_ok() {
-        let raw_config = raw_config?;
-        let parsed = toml::from_str::<toml::value::Table>(raw_config.as_str())?;
+        let raw_config = raw_config.unwrap();
+        let parsed = toml::from_str::<toml::value::Table>(raw_config.as_str()).unwrap();
 
         let max_players = parsed.get("max_players");
         if max_players.is_some() {
@@ -57,8 +58,8 @@ pub fn get_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
             config.server_port = 25565;
         }
     } else if legacy_config.is_ok() {
-        let legacy_config = legacy_config?;
-        let parsed = legacy::get_legacy_config(legacy_config)?;
+        let legacy_config = legacy_config.unwrap();
+        let parsed = legacy::get_legacy_config(legacy_config);
         config = ServerConfig::from_legacy(parsed);
     } else {
         config = ServerConfig {
@@ -71,5 +72,5 @@ pub fn get_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
 
     log::debug!("{:?}", &config);
 
-    Ok(config)
+    config
 }

@@ -26,7 +26,7 @@ pub struct LegacyConfig {
     // TODO: add initial-disabled-packs and initial-enabled-packs
     pub level_name: String,
     pub level_seed: String,
-    // TODO: add level types
+    pub level_type: String,
     pub log_ips: bool,
     pub management_server_enabled: bool,
     pub management_server_host: String,
@@ -49,7 +49,7 @@ pub struct LegacyConfig {
     pub rate_limit: u16,
     pub rcon_password: String,
     pub rcon_port: u16,
-    // TODO: add region-file-compression
+    pub region_file_compression: String,
     pub require_resource_pack: bool,
     // TODO: add resource packs
     pub server_ip: String,
@@ -58,14 +58,11 @@ pub struct LegacyConfig {
     pub spawn_protection: u8,
     pub status_heartbeat_interval: u8,
     pub sync_chunk_writes: bool,
-    // TODO: add text-filtering-config
     pub view_distance: u8,
     pub whitelist: bool,
 }
 
-pub fn get_legacy_config(
-    legacy_config: String,
-) -> Result<LegacyConfig, Box<dyn std::error::Error>> {
+pub fn get_legacy_config(legacy_config: String) -> LegacyConfig {
     let mut config = LegacyConfig::default();
 
     for line in legacy_config.lines() {
@@ -75,13 +72,13 @@ pub fn get_legacy_config(
         let line_split: Vec<&str> = line.trim().split_terminator("=").collect();
         match line_split[0] {
             "max-players" => {
-                config.max_players = line_split[1].parse()?;
+                config.max_players = line_split[1].parse().unwrap();
             }
             "server-ip" => {
                 config.server_ip = line_split[1].to_string();
             }
             "server-port" => {
-                config.server_port = line_split[1].parse()?;
+                config.server_port = line_split[1].parse().unwrap();
             }
             _ => {
                 log::debug!("Unused value {}!", line_split[0]);
@@ -90,5 +87,5 @@ pub fn get_legacy_config(
         }
     }
 
-    Ok(config)
+    config
 }

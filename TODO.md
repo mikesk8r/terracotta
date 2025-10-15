@@ -1,7 +1,7 @@
 # TODO:
 ##### Note: This list may be updated or modified at any time. More entries may be added as more features are added.
 - [ ] Configuration
-    - [ ] TOML (?)
+    - [ ] TOML
     - [ ] server.properties
 - [ ] Vanilla Server Features
     - [ ] Network

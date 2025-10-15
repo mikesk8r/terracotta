@@ -9,7 +9,7 @@ mod world;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = config::get_config()?;
+    let config = config::get_config();
     logs::setup_logger()?;
     let server = Arc::new(Mutex::new(server::ServerState::default()));
     let server_clone = server.clone();
