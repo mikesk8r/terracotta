@@ -5,6 +5,7 @@ use tokio::sync::Mutex;
 mod config;
 mod logs;
 mod server;
+mod tests;
 mod world;
 
 #[tokio::main]

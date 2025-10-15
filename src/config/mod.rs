@@ -1,3 +1,6 @@
+#[cfg(test)]
+pub mod legacy;
+#[cfg(not(test))]
 mod legacy;
 
 #[derive(Debug, Default)]
