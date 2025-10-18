@@ -19,7 +19,7 @@ pub fn setup_logger() -> Result<(), fern::InitError> {
     });
 
     #[cfg(not(debug_assertions))]
-    dispatch.level(log::Level::Info);
+    dispatch.level(log::LevelFilter::Info);
 
     dispatch.chain(std::io::stdout()).apply()?;
     Ok(())
