@@ -12,6 +12,7 @@ use crate::config;
 use crate::world::player::{ConnectionState, Player};
 
 pub mod network;
+mod registry;
 
 #[derive(Default)]
 pub struct ServerState {
@@ -247,34 +248,44 @@ pub async fn handle_client(
                     // TODO: properly process multiple packets
 
                     // TODO: write dimensions
-                    // let mut client_packet: Vec<u8> = vec![7, 0];
-                    // network::write_string(&mut client_packet, "minecraft:dimension_type".to_string());
+                    let dimensions = registry::DimensionTypeRegistry {
+                        registry_type: "minecraft:dimension".to_string(),
+                        dimensions: vec![registry::Dimension {
+                            name: "minecraft:overworld".to_string(),
+                            id: 0,
+                            entry: registry::DimensionType {
+                                has_skylight: true,
+                                has_ceiling: false,
+                                ultrawarm: false,
+                                natural: true,
+                                coordinate_scale: 1.0f64,
+                                bed_works: true,
+                                respawn_anchor_works: false,
+                                min_y: -64,
+                                height: 0,
+                                logical_height: 0,
+                                infiniburn: "#minecraft:infiniburn_overworld".to_string(),
+                                effects: "minecraft:overworld".to_string(),
+                                ambient_light: 0.0f32,
+                                piglin_safe: false,
+                                has_raids: true,
+                                monster_spawn_light_level: 0,
+                                monster_spawn_block_light_limit: 0,
+                            },
+                        }],
+                    };
 
-                    // let mut entries: Vec<u8> = vec![];
-                    // network::write_string(&mut entries, "minecraft:overworld".to_string());
-                    // // see https://minecraft.wiki/Java_Edition_protocol/Registry_data#Dimension_Type
-                    // entries.append(fastnbt::to_bytes(&1)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&1)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&(1 as f32))?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&1)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&-64)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&512)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&512)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&"#infiniburn_overworld")?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&"minecraft:overworld")?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&(0 as f32))?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&1)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
-                    // entries.append(fastnbt::to_bytes(&0)?.as_mut());
+                    // wrap in compound tag
+                    let mut data_root = std::collections::HashMap::new();
+                    data_root.insert("minecraft:dimension_type".to_string(), dimensions);
 
-                    // network::write_varint(&mut client_packet, entries.len() as i32);
-                    // client_packet.append(&mut entries);
+                    let data = fastnbt::to_bytes(&data_root)?;
+                    let mut client_packet: Vec<u8> = vec![];
+                    client_packet.push(data.len() as u8);
+                    client_packet.push(0x07);
+                    client_packet.extend_from_slice(&data);
 
-                    // let _ = write_packet(&stream, &client_packet).await;
+                    let _ = write_packet(&stream, &client_packet).await?;
 
                     let client_packet: Vec<u8> = vec![3, 0];
                     let _ = write_packet(&stream, &client_packet).await;
