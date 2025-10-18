@@ -5,6 +5,8 @@ mod legacy;
 
 #[derive(Debug, Default)]
 pub struct ServerConfig {
+    pub enforce_secure_chat: bool,
+    pub hardcore: bool,
     pub max_players: u32,
     pub motd: String,
     pub server_address: String,
@@ -15,6 +17,7 @@ impl ServerConfig {
     pub fn from_legacy(legacy_config: legacy::LegacyConfig) -> Self {
         let mut config = ServerConfig::default();
 
+        config.enforce_secure_chat = false;
         config.max_players = legacy_config.max_players;
         config.motd = legacy_config.motd;
         config.server_address = legacy_config.server_ip;
@@ -32,6 +35,20 @@ pub fn get_config() -> ServerConfig {
     if raw_config.is_ok() {
         let raw_config = raw_config.unwrap();
         let parsed = toml::from_str::<toml::value::Table>(raw_config.as_str()).unwrap();
+
+        let enforce_secure_chat = parsed.get("enforce_secure_chat");
+        if enforce_secure_chat.is_some() {
+            config.enforce_secure_chat = enforce_secure_chat.unwrap().as_bool().unwrap();
+        } else {
+            config.enforce_secure_chat = false;
+        }
+
+        let hardcore = parsed.get("hardcore");
+        if hardcore.is_some() {
+            config.hardcore = hardcore.unwrap().as_bool().unwrap();
+        } else {
+            config.hardcore = false;
+        }
 
         let max_players = parsed.get("max_players");
         if max_players.is_some() {
@@ -66,6 +83,8 @@ pub fn get_config() -> ServerConfig {
         config = ServerConfig::from_legacy(parsed);
     } else {
         config = ServerConfig {
+            enforce_secure_chat: false,
+            hardcore: false,
             max_players: 20,
             motd: "A Minecraft server".to_string(),
             server_address: "127.0.0.1".to_string(),
