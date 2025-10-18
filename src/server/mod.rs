@@ -239,15 +239,11 @@ pub async fn handle_client(
             }
         }
         if player.state == ConnectionState::Configuration {
-            // if packet_id == 0 {
-            //     player.state = ConnectionState::Play;
-            // }
             if packet_id == 2 {
                 if packet.len() > 2 {
                     // assume next packet has id 0x00
                     // TODO: properly process multiple packets
 
-                    // TODO: write dimensions
                     let dimensions = registry::DimensionTypeRegistry {
                         registry_type: "minecraft:dimension".to_string(),
                         dimensions: vec![registry::Dimension {
@@ -306,12 +302,16 @@ pub async fn start(
         server_config.server_address, server_config.server_port
     );
     let listener: TcpListener = TcpListener::bind(&address).await?;
-    // let server = Arc::new(Mutex::new(ServerState::default()));
     info!("Starting server at {}...", address);
     loop {
         let stream: TcpStream = listener.accept().await?.0;
         let server = Arc::clone(&server);
-        // TODO: add disconnect if players >= max_players
+        {
+            let locked = server.lock().await;
+            if locked.players.len() as u32 >= locked.max_players {
+                break Ok(());
+            }
+        }
         info!("Accepted new connection");
 
         let mut player: Player = Player::default();
