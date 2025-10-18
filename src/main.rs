@@ -13,6 +13,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::get_config();
     logs::setup_logger()?;
     let server = Arc::new(Mutex::new(server::ServerState::default()));
+    {
+        let mut server_lock = server.lock().await;
+        server_lock.max_players = config.max_players;
+    }
     let server_clone = server.clone();
     tokio::spawn(async move {
         let _ = server::start(config, &server_clone).await;
