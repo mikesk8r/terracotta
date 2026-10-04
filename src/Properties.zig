@@ -2,7 +2,21 @@
 
 const Properties = @This();
 
-accepts_transfers: bool,
+@"accepts-transfers": bool,
+@"allow-flight": bool,
+difficulty: enum {
+    peaceful,
+    easy,
+    normal,
+    hard,
+},
+gamemode: enum {
+    survival,
+    creative,
+    spectator,
+    adventure,
+},
+@"server-port": u16,
 
 fn fromBytes(data: []const u8) !Properties {
     const to_return = Properties {};
@@ -19,6 +33,7 @@ fn fromBytes(data: []const u8) !Properties {
             skip = false;
             const field = @field(to_return, key_buffer);
             field = @as(@TypeOf(field), value_buffer);
+
             continue;
         }
 
